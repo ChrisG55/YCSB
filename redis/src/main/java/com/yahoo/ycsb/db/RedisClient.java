@@ -82,6 +82,13 @@ public class RedisClient extends DB {
   }
 
   /*
+   * Make the Jedis instance accessible to subclasses within the package.
+   */
+  Jedis getJedis() {
+    return jedis;
+  }
+
+  /*
    * Calculate a hash for a key to store it in an index. The actual return value
    * of this function is not interesting -- it primarily needs to be fast and
    * scattered along the whole space of doubles. In a real world scenario one
