@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import com.yahoo.ycsb.Utils;
 
@@ -76,6 +77,27 @@ public class RandomStringGenerator extends StringGenerator {
   public String nextValue() {
     String ret;
     StringBuilder sb = new StringBuilder(len);
+    while (sb.length() < len) {
+      String word = DICTIONARY.get(rng.nextInt(DICTIONARY_SIZE));
+      sb.append(word);
+      sb.append(" ");
+    }
+    sb.setLength(len - 1);
+    ret = sb.toString();
+    setLastValue(ret);
+
+    return ret;
+  }
+
+  public String nextValue(UUID uuid) {
+    String ret;
+    StringBuilder sb = new StringBuilder(len);
+    if (len < 36) {
+      System.out.println("WARNING: field length is too short to store UUID. Field length is set to 36 characters.");
+      this.len = 36;
+    }
+    sb.append(uuid.toString());
+    sb.append(" ");
     while (sb.length() < len) {
       String word = DICTIONARY.get(rng.nextInt(DICTIONARY_SIZE));
       sb.append(word);

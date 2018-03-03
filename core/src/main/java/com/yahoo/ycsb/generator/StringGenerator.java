@@ -17,6 +17,8 @@
 
 package com.yahoo.ycsb.generator;
 
+import java.util.UUID;
+
 /**
  * A generator that is capable of generating string values.
  *
@@ -32,11 +34,12 @@ public abstract class StringGenerator extends Generator<String> {
     lastVal = last;
   }
 
-
   @Override
   public String lastValue() {
     return lastVal;
   }
+
+  public abstract String nextValue(UUID uuid);
 
   /**
    * Return the expected number of characters (mean) of the values this

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.yahoo.ycsb.Utils;
 
@@ -31,6 +32,7 @@ import com.yahoo.ycsb.Utils;
  */
 public class ConstantStringGenerator extends StringGenerator {
 
+  private int len;
   private final String lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incidi" +
       "dunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi" +
       " ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dol" +
@@ -43,20 +45,21 @@ public class ConstantStringGenerator extends StringGenerator {
   }
 
   /**
-   * @param i The length of the string in bytes this generator will always
+   * @param len The length of the string in bytes this generator will always
    * return.
    */
-  public ConstantStringGenerator(int i) {
-    StringBuilder sb = new StringBuilder(i + 1);
+  public ConstantStringGenerator(int len) {
+    this.len = len;
+    StringBuilder sb = new StringBuilder(len + 1);
     int byteCount = 0;
     List<String> dictionary = readDictionary("lorem.txt");
     int dictSize = dictionary.size();
-    while (sb.length() < i) {
+    while (sb.length() < len) {
       String word = dictionary.get(Utils.random().nextInt(dictSize));
       sb.append(word);
       sb.append(" ");
     }
-    sb.setLength(i);
+    sb.setLength(len);
     this.s = sb.toString();
     setLastValue(this.s);
   }
@@ -72,6 +75,21 @@ public class ConstantStringGenerator extends StringGenerator {
   @Override
   public String nextValue() {
     return s;
+  }
+
+  @Override
+  public String nextValue(UUID uuid) {
+    if (len < 36) {
+      System.out.println("WARNING: field length is too short to store UUID. Field length is set to 36 characters.");
+      this.len = 36;
+    }
+    StringBuilder sb = new StringBuilder(36 + 1 + s.length());
+    sb.append(uuid.toString());
+    sb.append(" ");
+    sb.append(this.s);
+    sb.setLength(len);
+
+    return sb.toString();
   }
 
   @Override
