@@ -226,6 +226,38 @@ public class BasicDB extends DB {
   }
 
   /**
+   * Update a record in the database. Any field/value pairs in the specified values HashMap will be written into the
+   * record with the specified record key, overwriting any existing values with the same field name.
+   *
+   * @param table  The name of the table
+   * @param key    The record key of the record to write.
+   * @param uuid   The universally unique identifier (UUID).
+   * @param values A HashMap of field/value pairs to update in the record
+   * @return Zero on success, a non-zero error code on error
+   */
+  public Status update(String table, String key, UUID uuid, Map<String, ByteIterator> values) {
+    delay();
+
+    if (verbose) {
+      StringBuilder sb = getStringBuilder();
+      sb.append("UPDATE ").append(table).append(" ").append(uuid.toString()).append(" ").append(key).append(" [ ");
+      if (values != null) {
+        for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
+          sb.append(entry.getKey()).append("=").append(entry.getValue()).append(" ");
+        }
+      }
+      sb.append("]");
+      System.out.println(sb);
+    }
+
+    if (count) {
+      incCounter(updates, hash(table, key, values));
+    }
+    
+    return Status.OK;
+  }
+
+  /**
    * Insert a record in the database. Any field/value pairs in the specified values HashMap will be written into the
    * record with the specified record key.
    *
@@ -257,6 +289,38 @@ public class BasicDB extends DB {
     return Status.OK;
   }
 
+  /**
+   * Insert a record in the database. Any field/value pairs in the specified values HashMap will be written into the
+   * record with the specified record key.
+   *
+   * @param table  The name of the table
+   * @param key    The record key of the record to insert.
+   * @param uuid   The universally unique identifier (UUID).
+   * @param values A HashMap of field/value pairs to insert in the record
+   * @return Zero on success, a non-zero error code on error
+   */
+  public Status insert(String table, String key, UUID uuid, Map<String, ByteIterator> values) {
+    delay();
+
+    if (verbose) {
+      StringBuilder sb = getStringBuilder();
+      sb.append("INSERT ").append(table).append(" ").append(uuid.toString()).append(" ").append(key).append(" [ ");
+      if (values != null) {
+        for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
+          sb.append(entry.getKey()).append("=").append(entry.getValue()).append(" ");
+        }
+      }
+
+      sb.append("]");
+      System.out.println(sb);
+    }
+
+    if (count) {
+      incCounter(inserts, hash(table, key, values));
+    }
+    
+    return Status.OK;
+  }
 
   /**
    * Delete a record from the database.

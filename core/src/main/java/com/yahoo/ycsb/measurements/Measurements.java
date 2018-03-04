@@ -22,6 +22,7 @@ import com.yahoo.ycsb.measurements.exporter.MeasurementsExporter;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -196,6 +197,30 @@ public class Measurements {
   }
 
   /**
+   * Report a single value of a single metric for a specific UUID. E.g. for read
+ latency, operation="READ" and latency
+   * is the measured value.
+   *
+   * @param operation The operation.
+   * @param uuid The universally unique identifier (UUID).
+   * @param latency The measured latency value.
+   */
+  public void measure(String operation, UUID uuid, int latency) {
+    if (measurementInterval == 1) {
+      return;
+    }
+    try {
+      OneMeasurement m = getOpMeasurement(operation);
+      m.measure(uuid, latency);
+    } catch (java.lang.ArrayIndexOutOfBoundsException e) {
+      // This seems like a terribly hacky way to cover up for a bug in the measurement code
+      System.out.println("ERROR: java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");
+      e.printStackTrace();
+      e.printStackTrace(System.out);
+    }
+  }
+
+  /**
    * Report a single value of a single metric. E.g. for read latency, operation="READ" and latency is the measured
    * value.
    */
@@ -206,6 +231,30 @@ public class Measurements {
     try {
       OneMeasurement m = getOpIntendedMeasurement(operation);
       m.measure(latency);
+    } catch (java.lang.ArrayIndexOutOfBoundsException e) {
+      // This seems like a terribly hacky way to cover up for a bug in the measurement code
+      System.out.println("ERROR: java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");
+      e.printStackTrace();
+      e.printStackTrace(System.out);
+    }
+  }
+
+  /**
+   * Report a single value of a single metric for a specific UUID. E.g. for read
+ latency, operation="READ" and latency
+   * is the measured value.
+   *
+   * @param operation The operation.
+   * @param uuid The universally unique identifier (UUID).
+   * @param latency The measured latency value.
+   */
+  public void measureIntended(String operation, UUID uuid, int latency) {
+    if (measurementInterval == 0) {
+      return;
+    }
+    try {
+      OneMeasurement m = getOpIntendedMeasurement(operation);
+      m.measure(uuid, latency);
     } catch (java.lang.ArrayIndexOutOfBoundsException e) {
       // This seems like a terribly hacky way to cover up for a bug in the measurement code
       System.out.println("ERROR: java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");

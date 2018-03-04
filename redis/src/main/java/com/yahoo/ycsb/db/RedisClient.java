@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.Vector;
 
 /**
@@ -134,6 +135,18 @@ public class RedisClient extends DB {
   }
 
   @Override
+  public Status insert(String table, String key, UUID uuid,
+      Map<String, ByteIterator> values) {
+    if (jedis.hmset(key, StringByteIterator.getStringMap(values))
+        .equals("OK")) {
+      jedis.zadd(INDEX_KEY, hash(key), key);
+      return Status.OK;
+    }
+    return Status.ERROR;
+  }
+
+
+  @Override
   public Status delete(String table, String key) {
     return jedis.del(key) == 0 && jedis.zrem(INDEX_KEY, key) == 0 ? Status.ERROR
         : Status.OK;
@@ -141,6 +154,13 @@ public class RedisClient extends DB {
 
   @Override
   public Status update(String table, String key,
+      Map<String, ByteIterator> values) {
+    return jedis.hmset(key, StringByteIterator.getStringMap(values))
+        .equals("OK") ? Status.OK : Status.ERROR;
+  }
+
+  @Override
+  public Status update(String table, String key, UUID uuid,
       Map<String, ByteIterator> values) {
     return jedis.hmset(key, StringByteIterator.getStringMap(values))
         .equals("OK") ? Status.OK : Status.ERROR;

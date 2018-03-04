@@ -18,6 +18,7 @@
 package com.yahoo.ycsb;
 
 import java.util.Map;
+import java.util.UUID;
 import com.yahoo.ycsb.measurements.Measurements;
 import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.Tracer;
@@ -181,6 +182,23 @@ public class DBWrapper extends DB {
         (int) ((endTimeNanos - intendedStartTimeNanos) / 1000));
   }
 
+  private void measure(String op, UUID uuid, Status result, long intendedStartTimeNanos,
+                       long startTimeNanos, long endTimeNanos) {
+    String measurementName = op;
+    if (result == null || !result.isOk()) {
+      if (this.reportLatencyForEachError ||
+          this.latencyTrackedErrors.contains(result.getName())) {
+        measurementName = op + "-" + result.getName();
+      } else {
+        measurementName = op + "-FAILED";
+      }
+    }
+    measurements.measure(measurementName, uuid,
+        (int) ((endTimeNanos - startTimeNanos) / 1000));
+    measurements.measureIntended(measurementName, uuid,
+        (int) ((endTimeNanos - intendedStartTimeNanos) / 1000));
+  }
+
   /**
    * Update a record in the database. Any field/value pairs in the specified values HashMap will be written into the
    * record with the specified record key, overwriting any existing values with the same field name.
@@ -198,6 +216,29 @@ public class DBWrapper extends DB {
       Status res = db.update(table, key, values);
       long en = System.nanoTime();
       measure("UPDATE", res, ist, st, en);
+      measurements.reportStatus("UPDATE", res);
+      return res;
+    }
+  }
+
+  /**
+   * Update a record in the database. Any field/value pairs in the specified values HashMap will be written into the
+   * record with the specified record key, overwriting any existing values with the same field name.
+   *
+   * @param table The name of the table
+   * @param key The record key of the record to write.
+   * @param uuid The universally unique identifier (UUID).
+   * @param values A HashMap of field/value pairs to update in the record
+   * @return The result of the operation.
+   */
+  public Status update(String table, String key, UUID uuid,
+                       Map<String, ByteIterator> values) {
+    try (final TraceScope span = tracer.newScope(scopeStringUpdate)) {
+      long ist = measurements.getIntendedtartTimeNs();
+      long st = System.nanoTime();
+      Status res = db.update(table, key, values);
+      long en = System.nanoTime();
+      measure("UPDATE", uuid, res, ist, st, en);
       measurements.reportStatus("UPDATE", res);
       return res;
     }
@@ -225,6 +266,31 @@ public class DBWrapper extends DB {
       return res;
     }
   }
+
+  /**
+   * Insert a record in the database. Any field/value pairs in the specified
+   * values HashMap will be written into the record with the specified
+   * record key.
+   *
+   * @param table The name of the table
+   * @param key The record key of the record to insert.
+   * @param uuid The universally unique identifier (UUID).
+   * @param values A HashMap of field/value pairs to insert in the record
+   * @return The result of the operation.
+   */
+  public Status insert(String table, String key, UUID uuid,
+                       Map<String, ByteIterator> values) {
+    try (final TraceScope span = tracer.newScope(scopeStringInsert)) {
+      long ist = measurements.getIntendedtartTimeNs();
+      long st = System.nanoTime();
+      Status res = db.insert(table, key, values);
+      long en = System.nanoTime();
+      measure("INSERT", uuid, res, ist, st, en);
+      measurements.reportStatus("INSERT", res);
+      return res;
+    }
+  }
+
 
   /**
    * Delete a record from the database.

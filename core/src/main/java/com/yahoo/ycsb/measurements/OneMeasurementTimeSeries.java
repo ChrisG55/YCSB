@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.UUID;
 
 class SeriesUnit {
   /**
@@ -113,6 +114,10 @@ public class OneMeasurementTimeSeries extends OneMeasurement {
     }
   }
 
+  @Override
+  public void measure(UUID uuid, int latency) {
+    measure(latency);
+  }
 
   @Override
   public void exportMeasurements(MeasurementsExporter exporter) throws IOException {

@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.Vector;
 
 import com.yahoo.ycsb.ByteIterator;
@@ -513,7 +514,22 @@ public class TestTimeSeriesWorkload {
     }
 
     @Override
+    public Status update(String table, String key, UUID uuid,
+        Map<String, ByteIterator> values) {
+      // TODO Auto-generated method stub
+      return Status.OK;
+    }
+
+    @Override
     public Status insert(String table, String key,
+        Map<String, ByteIterator> values) {
+      keys.add(key);
+      this.values.add(values);
+      return Status.OK;
+    }
+
+    @Override
+    public Status insert(String table, String key, UUID uuid,
         Map<String, ByteIterator> values) {
       keys.add(key);
       this.values.add(values);

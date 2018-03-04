@@ -22,6 +22,7 @@ import com.yahoo.ycsb.measurements.exporter.MeasurementsExporter;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -46,6 +47,7 @@ public abstract class OneMeasurement {
   }
 
   public abstract void measure(int latency);
+  public abstract void measure(UUID uuid, int latency);
 
   public abstract String getSummary();
 

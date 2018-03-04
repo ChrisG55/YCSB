@@ -31,6 +31,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  * Take measurements and maintain a HdrHistogram of a given metric, such as READ LATENCY.
@@ -87,6 +88,17 @@ public class OneMeasurementHdrHistogram extends OneMeasurement {
    * Using {@link Recorder} to support concurrent updates to histogram.
    */
   public void measure(int latencyInMicros) {
+    histogram.recordValue(latencyInMicros);
+  }
+
+  /**
+   * It appears latency is reported in micros.
+   * Using {@link Recorder} to support concurrent updates to histogram.
+   *
+   * @param uuid The universally unique identifier (UUID).
+   * @param latencyInMicros The latency in micro seconds.
+   */
+  public void measure(UUID uuid, int latencyInMicros) {
     histogram.recordValue(latencyInMicros);
   }
 

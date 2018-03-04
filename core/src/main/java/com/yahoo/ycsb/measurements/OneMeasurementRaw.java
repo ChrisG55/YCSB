@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  * Record a series of measurements as raw data points without down sampling,
@@ -41,10 +42,18 @@ public class OneMeasurementRaw extends OneMeasurement {
   class RawDataPoint {
     private final long timestamp;
     private final int value;
+    private final UUID uuid;
 
     public RawDataPoint(int value) {
       this.timestamp = System.currentTimeMillis();
       this.value = value;
+      this.uuid = null;
+    }
+
+    public RawDataPoint(UUID uuid, int value) {
+      this.timestamp = System.currentTimeMillis();
+      this.value = value;
+      this.uuid = uuid;
     }
 
     public long timeStamp() {
@@ -53,6 +62,10 @@ public class OneMeasurementRaw extends OneMeasurement {
 
     public int value() {
       return value;
+    }
+
+    public UUID uuid() {
+      return uuid;
     }
   }
 
@@ -139,17 +152,41 @@ public class OneMeasurementRaw extends OneMeasurement {
   }
 
   @Override
+  public synchronized void measure(UUID uuid, int latency) {
+    totalLatency += latency;
+    windowTotalLatency += latency;
+    windowOperations++;
+
+    measurements.add(new RawDataPoint(uuid, latency));
+  }
+
+  @Override
   public void exportMeasurements(MeasurementsExporter exporter)
       throws IOException {
     // Output raw data points first then print out a summary of percentiles to
     // stdout.
 
-    outputStream.println(getName() +
-        " latency raw data: op, timestamp(ms), latency(us)");
-    for (RawDataPoint point : measurements) {
-      outputStream.println(
-          String.format("%s,%d,%d", getName(), point.timeStamp(),
+    // We assume that if the first raw data point has a UUID all data points
+    // have a UUID.
+    boolean usesUUID = measurements.getFirst().uuid() != null;
+
+
+    if (usesUUID) {
+      outputStream.println(getName() + 
+          " latency raw data: op, uuid, timestamp(ms), latency(us)");
+      for (RawDataPoint point : measurements) {
+        outputStream.println(
+            String.format("%s,%s,%d,%d", getName(), point.uuid().toString(), point.timeStamp(),
               point.value()));
+      }
+    } else {
+      outputStream.println(getName() +
+          " latency raw data: op, timestamp(ms), latency(us)");
+      for (RawDataPoint point : measurements) {
+        outputStream.println(
+            String.format("%s,%d,%d", getName(), point.timeStamp(),
+              point.value()));
+      }
     }
     if (outputStream != System.out) {
       outputStream.close();

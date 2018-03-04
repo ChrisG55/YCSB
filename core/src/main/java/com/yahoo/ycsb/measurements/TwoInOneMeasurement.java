@@ -21,6 +21,7 @@ import com.yahoo.ycsb.Status;
 import com.yahoo.ycsb.measurements.exporter.MeasurementsExporter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * delegates to 2 measurement instances.
@@ -51,6 +52,17 @@ public class TwoInOneMeasurement extends OneMeasurement {
   public void measure(int latencyInMicros) {
     thing1.measure(latencyInMicros);
     thing2.measure(latencyInMicros);
+  }
+
+  /**
+   * It appears latency is reported in micros.
+   * Using {@link org.HdrHistogram.Recorder} to support concurrent updates to histogram.
+   * @param uuid The universally unique identifier (UUID).
+   * @param letencyInMicros The latency in micro seconds.
+   */
+  @Override
+  public void measure(UUID uuid, int latencyInMicros) {
+    measure(latencyInMicros);
   }
 
   /**

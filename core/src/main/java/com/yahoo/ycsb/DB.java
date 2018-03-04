@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.Vector;
 
 /**
@@ -114,6 +115,18 @@ public abstract class DB {
   public abstract Status update(String table, String key, Map<String, ByteIterator> values);
 
   /**
+   * Update a record in the database. Any field/value pairs in the specified values HashMap will be written into the
+   * record with the specified record key, overwriting any existing values with the same field name.
+   *
+   * @param table The name of the table
+   * @param key The record key of the record to write.
+   * @param uuid The universally unique identifier (UUID).
+   * @param values A HashMap of field/value pairs to update in the record
+   * @return The result of the operation.
+   */
+  public abstract Status update(String table, String key, UUID uuid, Map<String, ByteIterator> values);
+
+  /**
    * Insert a record in the database. Any field/value pairs in the specified values HashMap will be written into the
    * record with the specified record key.
    *
@@ -123,6 +136,18 @@ public abstract class DB {
    * @return The result of the operation.
    */
   public abstract Status insert(String table, String key, Map<String, ByteIterator> values);
+
+  /**
+   * Insert a record in the database. Any field/value pairs in the specified values HashMap will be written into the
+   * record with the specified record key.
+   *
+   * @param table The name of the table
+   * @param key The record key of the record to insert.
+   * @param uuid The universally unique identifier (UUID).
+   * @param values A HashMap of field/value pairs to insert in the record
+   * @return The result of the operation.
+   */
+  public abstract Status insert(String table, String key, UUID uuid, Map<String, ByteIterator> values);
 
   /**
    * Delete a record from the database.

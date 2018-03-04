@@ -22,6 +22,7 @@ import com.yahoo.ycsb.measurements.exporter.MeasurementsExporter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  * Take measurements and maintain a histogram of a given metric, such as READ LATENCY.
@@ -108,6 +109,16 @@ public class OneMeasurementHistogram extends OneMeasurement {
     if ((max < 0) || (latency > max)) {
       max = latency;
     }
+  }
+
+  /**
+   * Wrapper method for {@link #measure(int)}.
+   *
+   * @param uuid The universally unique identifier (UUID).
+   * @param latency The latency in micro seconds.
+   */
+  public void measure(UUID uuid, int latency) {
+    measure(latency);
   }
 
   @Override
