@@ -90,6 +90,7 @@ DATABASES = {
     "rados"        : "com.yahoo.ycsb.db.RadosClient",
     "redis"        : "com.yahoo.ycsb.db.RedisClient",
     "redis-hincr"  : "com.yahoo.ycsb.db.HincrbyClient",
+    "redis-stream" : "com.yahoo.ycsb.db.RedisStreamingClient",
     "rest"         : "com.yahoo.ycsb.webservice.rest.RestClient",
     "riak"         : "com.yahoo.ycsb.db.riak.RiakKVClient",
     "s3"           : "com.yahoo.ycsb.db.S3Client",
