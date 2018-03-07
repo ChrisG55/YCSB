@@ -64,6 +64,13 @@ LICENSE file.
     </dependencies>
   </dependencyManagement>
 
+  <repositories>
+    <repository>
+      <id>repo</id>
+      <url>file://${project.basedir}/repo</url>
+    </repository>
+  </repositories>
+
   <!-- Properties Management -->
   <properties>
     <maven.assembly.version>2.5.5</maven.assembly.version>
@@ -86,7 +93,7 @@ LICENSE file.
     <mongodb.version>3.0.3</mongodb.version>
     <mongodb.async.version>2.0.1</mongodb.async.version>
     <orientdb.version>2.2.10</orientdb.version>
-    <redis.version>2.0.0</redis.version>
+    <redis.version>2.9.1</redis.version>
     <s3.version>1.10.20</s3.version>
     <voldemort.version>0.81</voldemort.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
